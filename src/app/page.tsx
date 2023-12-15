@@ -1,95 +1,60 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+import { useState } from "react";
+import axios from "axios";
+import "./globals.css";
 
 export default function Home() {
+  let [content, setContent] = useState("");
+  const [text, setText] = useState("");
+  const [response, setReponse] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  async function submit() {
+    setLoading(true);
+    setContent(text);
+
+    setReponse(null);
+
+    try {
+      let result = await axios.post("api/responseapi", { question: text });
+
+      setReponse(result.data);
+      console.log(result.data.success);
+      console.log(result.data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+
+    setText("");
+  }
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+    <main style={{ textAlign: "center" }}>
+      <h1>GPT-DEMO</h1>
+      <div>
+        <input
+          style={{ width: "300px", height: "40px", padding: "0px 6px" }}
+          type="Message Gpt"
+          onChange={e => setText(e.target.value)}
+          value={text}
+          placeholder="Message GPT..."
         />
+        <button style={{ padding: "12px 14px" }} onClick={submit}>
+          submit
+        </button>
       </div>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <div
+        style={{
+          width: "80%",
+          margin: "40px auto",
+        }}
+      >
+        {content.length <= 0 ? <h3>How can I help you today?</h3> : ""}
+        {loading ? "Please wait..." : ""}
+        {response ? <p>{response.message}</p> : ""}
       </div>
     </main>
-  )
+  );
 }
